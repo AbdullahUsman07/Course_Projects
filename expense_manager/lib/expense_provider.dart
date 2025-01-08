@@ -8,13 +8,17 @@ class ExpenseProvider with ChangeNotifier {
   final LocalStorage storage;
   List<Expense> _expenses = [];
   List<Category> _category=[];
+  List<Tag> _tags=[];
+
 
   List<Expense> get expenses => _expenses;
   List<Category> get category => _category;
+  List<Tag> get tags=> _tags;
 
   ExpenseProvider(this.storage) {
     _loadExpensesFromStorage();
     _loadCategoriesFromStorage();
+    _loadTagsFromStorage();
   }
 
   void _loadExpensesFromStorage() async {
@@ -55,6 +59,31 @@ class ExpenseProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void _loadTagsFromStorage()async{
+    var storedTags=storage.getItem('tags');
+    if(storedTags!=null){
+      _tags=List<Tag>.from((storedTags as List).map((item)=>Tag.fromJson(item)));
+      notifyListeners();
+    }
+  }
+
+  void saveTagsToStorage(){
+    final jsonString =jsonEncode(_tags.map((e)=>e.toJson()).toList());
+    storage.setItem('tags', jsonString);
+  }
+
+  void addTag(Tag tag){
+    _tags.add(tag);
+    saveTagsToStorage();
+    notifyListeners();
+  }
+
+  void removeTag(String id){
+    _tags.removeWhere((tag)=>tag.id==id);
+    saveTagsToStorage();
+    notifyListeners();
+  }
+
   // category
   void _loadCategoriesFromStorage()async{
     var storedCategories= storage.getItem('categories');
@@ -63,8 +92,6 @@ class ExpenseProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-  
 
   void _saveCategorytoStorage(){
     String jsonString = jsonEncode(_category.map((e) => e.toJson()).toList());

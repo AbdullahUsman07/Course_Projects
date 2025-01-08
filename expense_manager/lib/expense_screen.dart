@@ -25,7 +25,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       appBar: AppBar(
         title:const Text('Add Expense'),
         centerTitle: true,
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.deepPurple,
       ),
       body:Column(
         children: [

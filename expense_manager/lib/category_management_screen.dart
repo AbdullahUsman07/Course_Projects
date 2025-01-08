@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'category_tag.dart';
 import 'classes.dart';
 import 'expense_provider.dart';
-import 'category_tag.dart';
+import 'category_tag_class.dart';
 
 class CategoryManagementScreen extends StatelessWidget {
   @override
@@ -12,7 +11,8 @@ class CategoryManagementScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Manage Categories'),
           centerTitle: true,
-          backgroundColor: Colors.purple,
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
         ),
         body: Consumer<ExpenseProvider>(
           builder: (context, provider, child) {
@@ -33,22 +33,21 @@ class CategoryManagementScreen extends StatelessWidget {
           },
         ),
         floatingActionButton: FloatingActionButton(onPressed: (){
-          _showCategoryDialog(context);
+          showAddCategoryDialog(context);
         },
         child:const Icon(Icons.add)),);
   }
 
-  void _showCategoryDialog(BuildContext context){
-     void _showAddCategoryDialog(BuildContext context) {
+  void showAddCategoryDialog(BuildContext context) {
     final TextEditingController _categoryNameController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Add Category'),
+          title: const Text('Add Category'),
           content: TextField(
             controller: _categoryNameController,
-            decoration: InputDecoration(labelText: 'Category Name'),
+            decoration: const InputDecoration(labelText: 'Category Name'),
           ),
           actions: <Widget>[
             TextButton(
@@ -66,7 +65,7 @@ class CategoryManagementScreen extends StatelessWidget {
                 Provider.of<ExpenseProvider>(context, listen: false).addCategory(category);
                 Navigator.pop(context);
               },
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ],
         );
@@ -74,4 +73,4 @@ class CategoryManagementScreen extends StatelessWidget {
     );
   }
   }
-}
+
