@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
+import 'dart:convert';
 import 'classes.dart';
 
 
 class ExpenseProvider with ChangeNotifier {
   final LocalStorage storage;
   List<Expense> _expenses = [];
+  List<Category> _category=[];
 
   List<Expense> get expenses => _expenses;
+  List<Category> get category => _category;
 
   ExpenseProvider(this.storage) {
     _loadExpensesFromStorage();
+    _loadCategoriesFromStorage();
   }
 
   void _loadExpensesFromStorage() async {
@@ -24,7 +28,8 @@ class ExpenseProvider with ChangeNotifier {
   }
 
   void _saveExpensesToStorage() {
-    storage.setItem('expenses', _expenses.map((e) => e.toJson()).toList());
+    String jsonString = jsonEncode(_expenses.map((e) => e.toJson()).toList());
+    storage.setItem('expenses', jsonString);
   }
 
   void addExpense(Expense expense) {
@@ -47,6 +52,34 @@ class ExpenseProvider with ChangeNotifier {
   void removeExpense(String id) {
     _expenses.removeWhere((expense) => expense.id == id);
     _saveExpensesToStorage();
+    notifyListeners();
+  }
+
+  // category
+  void _loadCategoriesFromStorage()async{
+    var storedCategories= storage.getItem('categories');
+    if(storedCategories!=null){
+      _category = List<Category>.from((storedCategories as List).map((item)=>Category.fromJson(item)));
+      notifyListeners();
+    }
+  }
+
+  
+
+  void _saveCategorytoStorage(){
+    String jsonString = jsonEncode(_category.map((e) => e.toJson()).toList());
+    storage.setItem('categories', jsonString);
+    
+  }
+  void addCategory(Category category){
+    _category.add(category);
+    _saveCategorytoStorage();
+    notifyListeners();
+  }
+
+  void removeCategory(String id){
+    _category.removeWhere((category)=>category.id ==id);
+    _saveCategorytoStorage();
     notifyListeners();
   }
 }
