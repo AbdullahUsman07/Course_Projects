@@ -2,33 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
-import 'classes.dart';
-import 'expense_screen.dart';
-import 'expense_provider.dart';
-
+import 'package:time_tracker/provider/project_task_provider.dart';
+import 'package:time_tracker/screens/AddTimeEntryScreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
   }
+
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Expense Tracker"),
+        title: Text("Time Tracker"),
         backgroundColor: Colors.deepPurple[800],
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -38,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen>
           unselectedLabelColor: Colors.white70,
           tabs: [
             Tab(text: "By Date"),
-            Tab(text: "By Category"),
+            Tab(text: "By Project"),
           ],
         ),
       ),
@@ -52,19 +54,19 @@ class _HomeScreenState extends State<HomeScreen>
                   style: TextStyle(color: Colors.white, fontSize: 24)),
             ),
             ListTile(
-              leading: Icon(Icons.category, color: Colors.deepPurple),
-              title: Text('Manage Categories'),
+              leading: Icon(Icons.work, color: Colors.deepPurple),
+              title: Text('Manage Projects'),
               onTap: () {
-                Navigator.pop(context); // This closes the drawer
-                Navigator.pushNamed(context, '/manage_categories');
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/manage_projects');
               },
             ),
             ListTile(
-              leading: Icon(Icons.tag, color: Colors.deepPurple),
-              title: Text('Manage Tags'),
+              leading: Icon(Icons.task, color: Colors.deepPurple),
+              title: Text('Manage Tasks'),
               onTap: () {
-                Navigator.pop(context); // This closes the drawer
-                Navigator.pushNamed(context, '/manage_tags');
+                Navigator.pop(context);
+                Navigator.pushNamed(context, '/manage_tasks');
               },
             ),
           ],
@@ -73,39 +75,40 @@ class _HomeScreenState extends State<HomeScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          buildExpensesByDate(context),
-          buildExpensesByCategory(context),
+          buildEntriesByDate(context),
+          buildEntriesByProject(context),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.deepPurple,
         onPressed: () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AddExpenseScreen())),
-        tooltip: 'Add Expense',
+            MaterialPageRoute(builder: (context) => AddtimeEntryScreen())),
+        tooltip: 'Add Entry',
         child: Icon(Icons.add),
       ),
     );
   }
-  Widget buildExpensesByDate(BuildContext context) {
-    return Consumer<ExpenseProvider>(
+
+  Widget buildEntriesByDate(BuildContext context) {
+    return Consumer<TimeEntryProvider>(
       builder: (context, provider, child) {
-        if (provider.expenses.isEmpty) {
+        if (provider.entries.isEmpty) {
           return Center(
-            child: Text("Click the + button to record expenses.",
+            child: Text("Click the + button to record time entries.",
                 style: TextStyle(color: Colors.grey[600], fontSize: 18)),
           );
         }
         return ListView.builder(
-          itemCount: provider.expenses.length,
+          itemCount: provider.entries.length,
           itemBuilder: (context, index) {
-            final expense = provider.expenses[index];
+            final entry = provider.entries[index];
             String formattedDate =
-                DateFormat('MMM dd, yyyy').format(expense.date);
+                DateFormat('MMM dd, yyyy').format(entry.date);
             return Dismissible(
-              key: Key(expense.id),
+              key: Key(entry.id),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) {
-                provider.removeExpense(expense.id);
+                provider.removeTimeEntry(entry.id);
               },
               background: Container(
                 color: Colors.red,
@@ -118,9 +121,9 @@ class _HomeScreenState extends State<HomeScreen>
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                 child: ListTile(
                   title: Text(
-                      "${expense.payee} - \$${expense.amount.toStringAsFixed(2)}"),
+                      "${entry.taskID} - ${entry.time.toStringAsFixed(2)} hours"),
                   subtitle: Text(
-                      "$formattedDate - Category: ${getCategoryNameById(context, expense.categoryID)}"),
+                      "$formattedDate - Project: ${getProjectNameById(context, entry.projectID)}"),
                   isThreeLine: true,
                 ),
               ),
@@ -130,30 +133,30 @@ class _HomeScreenState extends State<HomeScreen>
       },
     );
   }
-  Widget buildExpensesByCategory(BuildContext context) {
-    return Consumer<ExpenseProvider>(
+
+  Widget buildEntriesByProject(BuildContext context) {
+    return Consumer<TimeEntryProvider>(
       builder: (context, provider, child) {
-        if (provider.expenses.isEmpty) {
+        if (provider.entries.isEmpty) {
           return Center(
-            child: Text("Click the + button to record expenses.",
+            child: Text("Click the + button to record time entries.",
                 style: TextStyle(color: Colors.grey[600], fontSize: 18)),
           );
         }
-        // Grouping expenses by category
-        var grouped = groupBy(provider.expenses, (Expense e) => e.categoryID);
+        // Grouping entries by project
+        var grouped = groupBy(provider.entries, (entry) => entry.projectID);
         return ListView(
           children: grouped.entries.map((entry) {
-            String categoryName = getCategoryNameById(
-                context, entry.key); // Ensure you implement this function
+            String projectName = getProjectNameById(context, entry.key);
             double total = entry.value.fold(
-                0.0, (double prev, Expense element) => prev + element.amount);
+                0.0, (double prev, element) => prev + element.time);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    "$categoryName - Total: \$${total.toStringAsFixed(2)}",
+                    "$projectName - Total: ${total.toStringAsFixed(2)} hours",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -162,20 +165,18 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 ListView.builder(
-                  physics:
-                      NeverScrollableScrollPhysics(), // to disable scrolling within the inner list view
-                  shrinkWrap:
-                      true, // necessary to integrate a ListView within another ListView
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
                   itemCount: entry.value.length,
                   itemBuilder: (context, index) {
-                    Expense expense = entry.value[index];
+                    var timeEntry = entry.value[index];
                     return ListTile(
                       leading:
-                          Icon(Icons.monetization_on, color: Colors.deepPurple),
+                          Icon(Icons.access_time, color: Colors.deepPurple),
                       title: Text(
-                          "${expense.payee} - \$${expense.amount.toStringAsFixed(2)}"),
+                          "${timeEntry.projectID} - ${timeEntry.time.toStringAsFixed(2)} hours"),
                       subtitle: Text(DateFormat('MMM dd, yyyy')
-                          .format(expense.date)),
+                          .format(timeEntry.date)),
                     );
                   },
                 ),
@@ -186,11 +187,11 @@ class _HomeScreenState extends State<HomeScreen>
       },
     );
   }
-  // home_screen.dart
-  String getCategoryNameById(BuildContext context, String categoryId) {
-    var category = Provider.of<ExpenseProvider>(context, listen: false)
-        .category
-        .firstWhere((cat) => cat.id == categoryId);
-    return category.name;
+
+  String getProjectNameById(BuildContext context, String projectId) {
+    var project = Provider.of<TimeEntryProvider>(context, listen: false)
+        .projects
+        .firstWhere((proj) => proj.id == projectId);
+    return project.name;
   }
 }

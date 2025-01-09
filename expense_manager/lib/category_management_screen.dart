@@ -71,6 +71,6 @@ class CategoryManagementScreen extends StatelessWidget {
         );
       },
     );
-  }
-  }
+    }
+   }
 

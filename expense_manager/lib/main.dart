@@ -7,11 +7,12 @@ import 'category_management_screen.dart';
 import 'tag_management_screen.dart';
 import 'expense_provider.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initLocalStorage();
-  runApp(MyApp(localStorage: localStorage));
-}
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await initLocalStorage();
+//   runApp(MyApp(localStorage: localStorage));
+// }
+
 class MyApp extends StatelessWidget {
   final LocalStorage localStorage;
   const MyApp({Key? key, required this.localStorage}) : super(key: key);
