@@ -24,7 +24,7 @@ class Expense{
       categoryID: json['categoryID'],
       payee:json['payee'],
       note:json['note'],
-      date:json['date'],
+      date:DateTime.parse(json['date']),
       tag:json['tag'],
     );
   }
@@ -36,7 +36,7 @@ class Expense{
       'categoryID':categoryID,
       'payee':payee,
       'note':note,
-      'date':date,
+      'date':date.toIso8601String(),
       'tag':tag,
     };
   }

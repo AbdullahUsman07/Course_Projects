@@ -9,13 +9,14 @@ class TagManagementScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Tasks'),
+        title: const Text('Manage Tasks',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.deepPurple[800],
+        foregroundColor: Colors.white,
       ),
       body:Consumer<TimeEntryProvider>(builder: (context,provider,child){
         return ListView.builder(
-          itemCount: provider.entries.length,
+          itemCount: provider.tasks.length,
           itemBuilder: (context,index){
             final task=provider.tasks[index];
             return ListTile(
@@ -40,7 +41,7 @@ class TagManagementScreen extends StatelessWidget{
 
     showDialog(context: context, builder: (context){
       return AlertDialog(
-        title: const Text('Add Tag'),
+        title: const Text('Add Task'),
         content: TextField(
           controller: _namTag,
           decoration:const InputDecoration(labelText: 'Tag Name'),

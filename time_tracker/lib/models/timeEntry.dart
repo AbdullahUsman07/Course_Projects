@@ -21,7 +21,7 @@ class TimeEntry {
       projectID: json['projectID'],
       taskID: json['taskID'],
       time: json['time'],
-      date: json['date'],
+      date: DateTime.parse(json['date']),
       notes: json['notes'],
     );
   }
@@ -32,7 +32,7 @@ class TimeEntry {
       'projectID':projectID,
       'taskID':taskID,
       'time':time,
-      'date':date,
+      'date':date.toIso8601String(),
       'notes':notes,
     };
   }

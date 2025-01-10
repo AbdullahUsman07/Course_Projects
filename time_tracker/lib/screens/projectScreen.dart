@@ -9,14 +9,15 @@ class ProjectManageScreen extends StatelessWidget{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Projects'),
+        title: const Text('Manage Projects',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.deepPurple[800],
+        foregroundColor: Colors.white,
       ),
       body:Consumer<TimeEntryProvider>(
         builder: (context,provider,child){
           return ListView.builder(
-            itemCount: provider.entries.length,
+            itemCount: provider.projects.length,
             itemBuilder: (context,index){
               final project=provider.projects[index];
               return ListTile(
@@ -61,3 +62,5 @@ class ProjectManageScreen extends StatelessWidget{
     },);
   }
 }
+
+

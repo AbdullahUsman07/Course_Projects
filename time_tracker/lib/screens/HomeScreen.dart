@@ -1,9 +1,15 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 import 'package:time_tracker/provider/project_task_provider.dart';
 import 'package:time_tracker/screens/AddTimeEntryScreen.dart';
+import 'package:time_tracker/models/timeEntry.dart';
+import 'package:time_tracker/screens/projectScreen.dart';
+import 'package:time_tracker/screens/taskScreen.dart';
+import 'package:time_tracker/models/project.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -30,9 +36,10 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Time Tracker"),
+        title: Text("Time Tracker",style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.deepPurple[800],
         foregroundColor: Colors.white,
+        centerTitle: true,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
@@ -174,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen>
                       leading:
                           Icon(Icons.access_time, color: Colors.deepPurple),
                       title: Text(
-                          "${timeEntry.projectID} - ${timeEntry.time.toStringAsFixed(2)} hours"),
+                          "${timeEntry.taskID} - ${timeEntry.time.toStringAsFixed(2)} hours"),
                       subtitle: Text(DateFormat('MMM dd, yyyy')
                           .format(timeEntry.date)),
                     );
@@ -191,7 +198,10 @@ class _HomeScreenState extends State<HomeScreen>
   String getProjectNameById(BuildContext context, String projectId) {
     var project = Provider.of<TimeEntryProvider>(context, listen: false)
         .projects
-        .firstWhere((proj) => proj.id == projectId);
-    return project.name;
+        .firstWhere(
+          (proj) => proj.id == projectId,
+          orElse: () =>  Project(id: '', name: 'Unknown Project'),
+        );
+    return project?.name ?? "Unknown Project";
   }
 }

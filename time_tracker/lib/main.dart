@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget{
       routes: {
         '/':(context)=>HomeScreen(),
         '/manage_projects':(context)=>ProjectManageScreen(),
-        '/manager_tasks':(context)=>TagManagementScreen(),
+        '/manage_tasks':(context)=>TagManagementScreen(),
       },
     ),
     );
